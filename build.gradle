@@ -1,0 +1,67 @@
+plugins {
+    id 'java'
+
+    id 'me.bristermitten.pdm' version '0.0.30'
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
+
+    id 'net.minecrell.plugin-yml.bukkit' version '0.3.0'
+}
+
+group = 'com.yuhtin.minecraft'
+version = '1.0.0'
+
+tasks.build.dependsOn('pdm', 'shadowJar')
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    jcenter()
+
+    // spigot
+
+    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url = 'https://oss.sonatype.org/content/groups/public/' }
+
+    // libs
+
+    maven { url = 'https://mvn.intellectualsites.com/content/groups/public/' }
+    maven { url = 'https://jitpack.io/' }
+}
+
+dependencies {
+
+    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+    compileOnly 'com.plotsquared:PlotSquared-Core:5.13.3'
+    compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
+
+    implementation 'com.github.HenryFabio:inventory-api:2.0.3'
+    implementation 'com.github.HenryFabio:sql-provider:9561f20fd2'
+
+    pdm 'com.github.SaiintBrisson:command-framework:1.1.0'
+
+    def lombok = 'org.projectlombok:lombok:1.18.16'
+    compileOnly lombok
+    annotationProcessor lombok
+
+}
+
+bukkit {
+    main = 'com.yuhtin.minecraft.storage.Storage'
+    authors = ['Yuhtin']
+    version = "${project.version}"
+    depend = ['Vault', 'PlotSquared']
+    load = 'STARTUP'
+}
+
+shadowJar {
+    archiveName("${project.name}-${project.version}.jar")
+    relocate 'com.henryfabio.minecraft.inventoryapi', 'com.yuhtin.minecraft.storage.libs.inventoryapi'
+    relocate 'com.henryfabio.sqlprovider', 'com.yuhtin.minecraft.storage.libs.sqlprovider'
+}
+
+compileJava {
+    options.encoding('UTF-8')
+
+    sourceCompatibility('1.8')
+    targetCompatibility('1.8')
+}

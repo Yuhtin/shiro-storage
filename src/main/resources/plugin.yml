@@ -1,0 +1,4 @@
+name: (SHIRO) Storage
+version: @version@
+main: com.yuhtin.minecraft.storage.Storage
+authors: [ Yuhtin ]
