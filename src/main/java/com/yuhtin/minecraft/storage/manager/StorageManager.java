@@ -1,26 +1,27 @@
 package com.yuhtin.minecraft.storage.manager;
 
 import com.google.common.collect.Maps;
-import com.plotsquared.core.plot.Plot;
-import com.plotsquared.core.plot.PlotId;
+import com.intellectualcrafters.plot.object.Plot;
+import com.intellectualcrafters.plot.object.PlotId;
 import com.yuhtin.minecraft.storage.api.storage.PlotStorage;
 import com.yuhtin.minecraft.storage.sql.dao.StorageDAO;
+import lombok.Data;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author Yuhtin
  * Github: https://github.com/Yuhtin
  */
-@RequiredArgsConstructor
+
+@Data
 public final class StorageManager {
 
-    private final Map<PlotId, PlotStorage> plots = Maps.newHashMap();
+    @Getter private static final StorageManager instance = new StorageManager();
 
-    private final StorageDAO storageDAO;
+    private StorageDAO storageDAO;
+    private final Map<PlotId, PlotStorage> plots = Maps.newHashMap();
 
     public void init() {
         storageDAO.createTable();
@@ -58,6 +59,10 @@ public final class StorageManager {
 
         storageDAO.insertOne(plotId, storage);
         plots.remove(plotId);
+    }
+
+    public void purgeAll() {
+        plots.keySet().forEach(this::purge);
     }
 
     public void addAccount(PlotId plotId, PlotStorage account) {

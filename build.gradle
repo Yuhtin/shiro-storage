@@ -8,7 +8,7 @@ plugins {
 }
 
 group = 'com.yuhtin.minecraft'
-version = '1.0.0'
+version = '1.0.1'
 
 tasks.build.dependsOn('pdm', 'shadowJar')
 
@@ -31,8 +31,7 @@ repositories {
 dependencies {
 
     compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
-    compileOnly 'com.plotsquared:PlotSquared-Core:5.13.3'
-    compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
+    compileOnly 'com.yuhtin.minecraft:plotsquared:1.0'
 
     implementation 'com.github.HenryFabio:inventory-api:2.0.3'
     implementation 'com.github.HenryFabio:sql-provider:9561f20fd2'
@@ -49,7 +48,7 @@ bukkit {
     main = 'com.yuhtin.minecraft.storage.Storage'
     authors = ['Yuhtin']
     version = "${project.version}"
-    depend = ['Vault', 'PlotSquared']
+    depend = ['PlotSquared']
     load = 'STARTUP'
 }
 

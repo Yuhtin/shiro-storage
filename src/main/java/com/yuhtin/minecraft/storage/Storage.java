@@ -1,10 +1,17 @@
 package com.yuhtin.minecraft.storage;
 
+import com.henryfabio.minecraft.inventoryapi.manager.InventoryManager;
 import com.henryfabio.sqlprovider.connector.SQLConnector;
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
+import com.yuhtin.minecraft.storage.command.StorageCommand;
+import com.yuhtin.minecraft.storage.manager.ItemManager;
+import com.yuhtin.minecraft.storage.manager.StorageManager;
+import com.yuhtin.minecraft.storage.parser.ItemParser;
 import com.yuhtin.minecraft.storage.sql.SQLProvider;
 import com.yuhtin.minecraft.storage.sql.dao.StorageDAO;
 import me.bristermitten.pdm.PluginDependencyManager;
+import me.saiintbrisson.bukkit.command.BukkitFrame;
+import me.saiintbrisson.minecraft.command.message.MessageType;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -14,6 +21,8 @@ public final class Storage extends JavaPlugin {
     private SQLExecutor sqlExecutor;
 
     private StorageDAO storageDAO;
+
+    public static Storage getInstance() { return getPlugin(Storage.class); }
 
     @Override
     public void onLoad() {
@@ -27,10 +36,25 @@ public final class Storage extends JavaPlugin {
 
             try {
 
+                InventoryManager.enable(this);
+
                 sqlConnector = SQLProvider.of(this).setup();
                 sqlExecutor = new SQLExecutor(sqlConnector);
 
                 storageDAO = new StorageDAO(sqlExecutor);
+
+                StorageManager storageManager = StorageManager.getInstance();
+
+                storageManager.setStorageDAO(storageDAO);
+                storageManager.init();
+
+                BukkitFrame bukkitFrame = new BukkitFrame(this);
+                bukkitFrame.registerCommands(new StorageCommand());
+
+                ItemParser itemParser = new ItemParser();
+                ItemManager itemManager = ItemManager.getInstance();
+
+                itemParser.parseItemCollection(getConfig().getConfigurationSection("items")).forEach(itemManager::addItem);
 
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -44,6 +68,6 @@ public final class Storage extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        StorageManager.getInstance().purgeAll();
     }
 }

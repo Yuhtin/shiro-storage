@@ -2,7 +2,6 @@ package com.yuhtin.minecraft.storage.api.storage;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import lombok.Builder;
 import lombok.Data;
 import org.bukkit.Material;
 
@@ -18,6 +17,5 @@ import java.util.Map;
 public class PlotStorage {
 
     private final Map<Material, Double> storage = Maps.newHashMap();
-    private final List<String> friends = Lists.newArrayList();
 
 }

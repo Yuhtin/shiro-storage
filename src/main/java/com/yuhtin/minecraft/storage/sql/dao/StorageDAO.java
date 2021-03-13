@@ -1,7 +1,7 @@
 package com.yuhtin.minecraft.storage.sql.dao;
 
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
-import com.plotsquared.core.plot.PlotId;
+import com.intellectualcrafters.plot.object.PlotId;
 import com.yuhtin.minecraft.storage.utils.Serializer;
 import com.yuhtin.minecraft.storage.api.storage.PlotStorage;
 import com.yuhtin.minecraft.storage.sql.dao.adapter.StorageAdapter;

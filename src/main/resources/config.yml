@@ -7,3 +7,11 @@ database:
     database: 'test'
   sqlite:
     file: 'database/database.db'
+
+sellCommand: 'coins add @player @coins'
+
+items:
+  cacto:
+    material: CACTUS
+    itemName: 'Cacto'
+    unitPrice: 10
