@@ -39,9 +39,7 @@ public class PlotReceiveItemListener implements Listener {
         event.setCancelled(true);
 
         PlotStorage plotStorage = StorageManager.getInstance().getByPlot(plot);
-
-        double items = plotStorage.getStorage().getOrDefault(itemStack.getType(), 0d);
-        plotStorage.getStorage().replace(itemStack.getType(), items + itemStack.getAmount());
+        plotStorage.getStorage().merge(itemStack.getType(), (double) itemStack.getAmount(), Double::sum);
 
         itemStack.setType(Material.AIR);
     }

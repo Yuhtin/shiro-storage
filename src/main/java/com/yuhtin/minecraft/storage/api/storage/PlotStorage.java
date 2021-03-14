@@ -15,5 +15,6 @@ import java.util.Map;
 public class PlotStorage {
 
     private final Map<Material, Double> storage = Maps.newHashMap();
+    private double coinsTotal;
 
 }

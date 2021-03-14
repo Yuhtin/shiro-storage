@@ -2,6 +2,7 @@ package com.yuhtin.minecraft.storage.inventory;
 
 import com.google.common.collect.Lists;
 import com.henryfabio.minecraft.inventoryapi.editor.InventoryEditor;
+import com.henryfabio.minecraft.inventoryapi.inventory.configuration.InventoryConfiguration;
 import com.henryfabio.minecraft.inventoryapi.inventory.impl.paged.PagedInventory;
 import com.henryfabio.minecraft.inventoryapi.item.InventoryItem;
 import com.henryfabio.minecraft.inventoryapi.item.supplier.InventoryItemSupplier;
@@ -9,6 +10,7 @@ import com.henryfabio.minecraft.inventoryapi.viewer.Viewer;
 import com.henryfabio.minecraft.inventoryapi.viewer.configuration.border.Border;
 import com.henryfabio.minecraft.inventoryapi.viewer.configuration.impl.ViewerConfigurationImpl;
 import com.henryfabio.minecraft.inventoryapi.viewer.impl.paged.PagedViewer;
+import com.intellectualcrafters.plot.object.Plot;
 import com.yuhtin.minecraft.storage.Storage;
 import com.yuhtin.minecraft.storage.api.item.StorageItem;
 import com.yuhtin.minecraft.storage.api.storage.PlotStorage;
@@ -30,10 +32,12 @@ import java.util.Map;
 public class StorageInventory extends PagedInventory {
 
     private static final String sellCommand = Storage.getInstance().getConfig().getString("sellCommand");
+    private static final String economyName = Storage.getInstance().getConfig().getString("economyName");
 
     private final PlotStorage plotStorage;
+    private final Plot plot;
 
-    public StorageInventory(PlotStorage plotStorage) {
+    public StorageInventory(Plot plot, PlotStorage plotStorage) {
 
         super(
                 "storage.main",
@@ -41,7 +45,11 @@ public class StorageInventory extends PagedInventory {
                 3 * 9
         );
 
+        this.plot = plot;
         this.plotStorage = plotStorage;
+
+        InventoryConfiguration configuration = getConfiguration();
+        configuration.secondUpdate(25);
 
     }
 
@@ -62,11 +70,17 @@ public class StorageInventory extends PagedInventory {
     @Override
     protected void configureInventory(Viewer viewer, InventoryEditor editor) {
 
-        double items = plotStorage.getStorage().values().stream().reduce(0d, StorageInventory::add);
+        double items = plotStorage.getStorage().values().stream().reduce(0d, Double::sum);
 
         editor.setItem(0, InventoryItem.of(new ItemBuilder("MFH_Beacon")
-                .name("&aInformações")
-                .lore("", " &fItems armazenados: &a" + MathUtils.format(items))
+                .name("&2Informações do Armazem")
+                .lore(
+                        "",
+                        " &aItens armazenados: &f" + MathUtils.format(items),
+                        " &a" + economyName + " adquiridos: &f" + MathUtils.format(plotStorage.getCoinsTotal()) + " " + economyName.toLowerCase(),
+                        " &aJogadores permitidos: &f" + (plot.getOwners().size() + plot.getTrusted().size()) + " jogador(es)",
+                        ""
+                )
                 .result())
         );
 
@@ -87,6 +101,8 @@ public class StorageInventory extends PagedInventory {
     public InventoryItem makeItem(Material material, double items) {
 
         StorageItem storageItem = ItemManager.getInstance().getItems().get(material);
+
+        int minCollect = (int) Math.min(items, 64);
         return InventoryItem.of(new ItemBuilder(material)
                 .name("&2" + storageItem.getName())
                 .lore(
@@ -94,8 +110,8 @@ public class StorageInventory extends PagedInventory {
                         " &fItens armazenados: &a" + MathUtils.format(items),
                         " &fPreço unitário: &a" + MathUtils.format(storageItem.getPrice()),
                         "",
-                        " &aClique esquerdo para vender &ftudo &apor &f" + MathUtils.format(storageItem.getPrice() * items) + " coins&a.",
-                        " &aClique direito para coletar &f64 itens&a.",
+                        " &aClique esquerdo para vender &ftudo &apor &f" + MathUtils.format(storageItem.getPrice() * items) + " " + economyName.toLowerCase() + "&a.",
+                        " &aClique direito para coletar &f" + minCollect + " itens&a.",
                         ""
                 )
                 .result()
@@ -105,7 +121,16 @@ public class StorageInventory extends PagedInventory {
 
             if (callback.getClickType().isLeftClick()) {
 
-                double price = storageItem.getPrice() * storageItem.getPrice();
+                if (items <= 0) {
+
+                    player.sendMessage(ColorUtils.colored(
+                            "&cVocê não tem itens para vender."
+                    ));
+                    return;
+
+                }
+
+                double price = items * storageItem.getPrice();
 
                 Bukkit.dispatchCommand(
                         Bukkit.getConsoleSender(),
@@ -114,35 +139,48 @@ public class StorageInventory extends PagedInventory {
                 );
 
                 plotStorage.getStorage().replace(material, 0d);
+                plotStorage.setCoinsTotal(plotStorage.getCoinsTotal() + price);
+
                 player.sendMessage(ColorUtils.colored(
-                        "&aVocê vendeu &f" + MathUtils.format(items) + " &apor &f" + price + " coins&a."
+                        "&aVocê vendeu &f" + MathUtils.format(items) + " &apor &f" + MathUtils.format(price) + " " + economyName.toLowerCase() + "&a."
                 ));
 
             } else {
 
-                if (items <= 64) {
+                if (minCollect == 0) {
 
-                    player.sendMessage(ColorUtils.colored("&cVocê não tem 64 itens para coletar."));
+                    player.sendMessage(ColorUtils.colored("&cVocê não tem nenhum item para coletar."));
                     return;
 
                 }
 
-                plotStorage.getStorage().replace(material, items - 64);
+                if (player.getInventory().firstEmpty() == -1) {
 
-                player.getInventory().addItem(new ItemBuilder(material).setAmount(64).result());
+                    player.sendMessage(ColorUtils.colored(
+                            "&cVocê não tem espaço no inventário para fazer isto."
+                    ));
+                    return;
+
+                }
+
+                plotStorage.getStorage().replace(material, items - minCollect);
+
+                player.getInventory().addItem(new ItemBuilder(material).setAmount(minCollect).result());
                 player.sendMessage(ColorUtils.colored(
-                        "&aVocê coletou 64 itens com sucesso."
+                        "&aVocê coletou &f'" + minCollect + " " + storageItem.getName() + "' &ado armazem com sucesso."
                 ));
 
-
             }
+
+            callback.updateInventory();
 
         });
 
     }
 
-    public static double add(double a, double b) {
-        return a + b;
+    @Override
+    protected void update(PagedViewer viewer, InventoryEditor editor) {
+        configureInventory(viewer, editor);
     }
 
 }

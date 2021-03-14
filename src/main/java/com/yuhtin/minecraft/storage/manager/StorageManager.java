@@ -52,17 +52,17 @@ public final class StorageManager {
         storageDAO.insertOne(plotId, account);
     }
 
-    public void purge(PlotId plotId) {
+    public void purge(PlotId plotId, boolean clear) {
 
         PlotStorage storage = plots.getOrDefault(plotId, null);
         if (storage == null) return;
 
         storageDAO.insertOne(plotId, storage);
-        plots.remove(plotId);
+        if (clear) plots.remove(plotId);
     }
 
     public void purgeAll() {
-        plots.keySet().forEach(this::purge);
+        plots.keySet().forEach($ -> purge($, false));
     }
 
     public void addAccount(PlotId plotId, PlotStorage account) {

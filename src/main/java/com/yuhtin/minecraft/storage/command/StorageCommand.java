@@ -52,7 +52,7 @@ public class StorageCommand {
 
         }
 
-        StorageInventory storageInventory = new StorageInventory(StorageManager.getInstance().getByPlot(plot)).init();
+        StorageInventory storageInventory = new StorageInventory(plot, StorageManager.getInstance().getByPlot(plot)).init();
         storageInventory.openInventory(sender);
 
     }

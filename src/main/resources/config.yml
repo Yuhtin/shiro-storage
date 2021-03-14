@@ -8,8 +8,13 @@ database:
   sqlite:
     file: 'database/database.db'
 
+# Nome da economia
+economyName: 'Coins'
+
+# Comando que será executado quando vender itens
 sellCommand: 'coins add @player @coins'
 
+# Lista de itens que serão armazenados
 items:
   cacto:
     material: CACTUS
