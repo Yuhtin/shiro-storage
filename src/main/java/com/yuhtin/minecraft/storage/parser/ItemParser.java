@@ -31,7 +31,7 @@ public class ItemParser {
     public StorageItem parseItemSection(ConfigurationSection section) {
 
         return StorageItem.builder()
-                .material(Material.getMaterial(section.getString("material")))
+                .material(Material.valueOf(section.getString("material").toUpperCase()))
                 .name(ColorUtils.colored(section.getString("itemName")))
                 .price(section.getDouble("unitPrice"))
                 .build();

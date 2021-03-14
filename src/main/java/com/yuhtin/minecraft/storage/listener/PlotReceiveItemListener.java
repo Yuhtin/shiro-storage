@@ -24,8 +24,6 @@ public class PlotReceiveItemListener implements Listener {
         boolean validItem = ItemManager.getInstance().getItems().containsKey(itemStack.getType());
         if (!validItem) return;
 
-        System.out.println("Test 1");
-
         org.bukkit.Location location = event.getLocation();
 
         Location plotLocation = new Location(
@@ -38,13 +36,11 @@ public class PlotReceiveItemListener implements Listener {
         Plot plot = Plot.getPlot(plotLocation);
         if (plot == null) return;
 
-        System.out.println("Test 2");
-
         event.setCancelled(true);
 
         PlotStorage plotStorage = StorageManager.getInstance().getByPlot(plot);
 
-        double items = plotStorage.getStorage().get(itemStack.getType());
+        double items = plotStorage.getStorage().getOrDefault(itemStack.getType(), 0d);
         plotStorage.getStorage().replace(itemStack.getType(), items + itemStack.getAmount());
 
         itemStack.setType(Material.AIR);

@@ -34,7 +34,14 @@ public class StorageCommand {
         );
 
         Plot plot = Plot.getPlot(plotLocation);
-        if (plot == null) return;
+        if (plot == null) {
+
+            sender.sendMessage(ColorUtils.colored(
+                    "&cVocê não está em uma plot."
+            ));
+            return;
+
+        }
 
         if (!plot.getOwners().contains(sender.getUniqueId()) && !plot.getTrusted().contains(sender.getUniqueId())) {
 

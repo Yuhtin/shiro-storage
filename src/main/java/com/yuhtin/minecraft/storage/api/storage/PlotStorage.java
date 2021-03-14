@@ -1,11 +1,9 @@
 package com.yuhtin.minecraft.storage.api.storage;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.Data;
 import org.bukkit.Material;
 
-import java.util.List;
 import java.util.Map;
 
 /**

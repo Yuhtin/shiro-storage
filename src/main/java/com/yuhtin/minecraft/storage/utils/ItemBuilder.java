@@ -7,11 +7,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class ItemBuilder {
     private final ItemStack itemStack;
@@ -50,7 +48,7 @@ public class ItemBuilder {
     }
 
     public ItemBuilder name(String name) {
-        itemMeta.setDisplayName(name);
+        itemMeta.setDisplayName(ColorUtils.colored(name));
         return this;
     }
 
@@ -60,12 +58,12 @@ public class ItemBuilder {
     }
 
     public ItemBuilder lore(String... lore) {
-        itemMeta.setLore(Arrays.asList(lore));
+        itemMeta.setLore(Arrays.stream(lore).map(ColorUtils::colored).collect(Collectors.toList()));
         return this;
     }
 
     public ItemBuilder lore(List<String> lore) {
-        itemMeta.setLore(lore);
+        lore(lore);
         return this;
     }
 

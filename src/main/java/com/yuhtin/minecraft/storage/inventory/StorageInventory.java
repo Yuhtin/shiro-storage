@@ -66,7 +66,7 @@ public class StorageInventory extends PagedInventory {
 
         editor.setItem(0, InventoryItem.of(new ItemBuilder("MFH_Beacon")
                 .name("&aInformações")
-                .lore("", " &fItems armazenados: " + MathUtils.format(items))
+                .lore("", " &fItems armazenados: &a" + MathUtils.format(items))
                 .result())
         );
 
