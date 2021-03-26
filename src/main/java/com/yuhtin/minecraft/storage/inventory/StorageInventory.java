@@ -118,10 +118,11 @@ public class StorageInventory extends PagedInventory {
         ).defaultCallback(callback -> {
 
             Player player = callback.getPlayer();
+            double currentItems = plotStorage.getStorage().get(material);
 
             if (callback.getClickType().isLeftClick()) {
 
-                if (items <= 0) {
+                if (currentItems <= 0) {
 
                     player.sendMessage(ColorUtils.colored(
                             "&cVocê não tem itens para vender."
@@ -130,7 +131,7 @@ public class StorageInventory extends PagedInventory {
 
                 }
 
-                double price = items * storageItem.getPrice();
+                double price = currentItems * storageItem.getPrice();
 
                 Bukkit.dispatchCommand(
                         Bukkit.getConsoleSender(),
@@ -142,7 +143,7 @@ public class StorageInventory extends PagedInventory {
                 plotStorage.setCoinsTotal(plotStorage.getCoinsTotal() + price);
 
                 player.sendMessage(ColorUtils.colored(
-                        "&aVocê vendeu &f" + MathUtils.format(items) + " &apor &f" + MathUtils.format(price) + " " + economyName.toLowerCase() + "&a."
+                        "&aVocê vendeu &f" + MathUtils.format(currentItems) + " &apor &f" + MathUtils.format(price) + " " + economyName.toLowerCase() + "&a."
                 ));
 
             } else {
@@ -163,7 +164,7 @@ public class StorageInventory extends PagedInventory {
 
                 }
 
-                plotStorage.getStorage().replace(material, items - minCollect);
+                plotStorage.getStorage().replace(material, currentItems - minCollect);
 
                 player.getInventory().addItem(new ItemBuilder(material).setAmount(minCollect).result());
                 player.sendMessage(ColorUtils.colored(
